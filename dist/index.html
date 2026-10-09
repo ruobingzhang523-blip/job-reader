@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>读懂岗位 · 知道从哪学</title>
+  <meta name="description" content="从招聘要求出发，为转行初学者整理学习顺序、掌握程度、真实课程和检验方法。">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23294fe5'/%3E%3Cpath d='M8 8h6c2 0 2 2 2 2s0-2 2-2h6v16h-6c-2 0-2 1-2 1s0-1-2-1H8Z' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header><a class="brand" href="./" aria-label="读懂岗位首页"><span class="brandmark" aria-hidden="true">读</span>读懂岗位</a><span class="edition" id="connection">正在检查模型服务…</span></header>
+  <main>
+    <div class="intro"><div><p class="eyebrow">给想转行、还不知道从哪里开始的你</p><h1>读懂岗位，知道从哪学。</h1><p class="lede">从你的基础出发，排好学习顺序，找到课程，再用一个小练习检验自己。</p></div><div class="chapter" aria-hidden="true">01<span>开始学习</span></div></div>
+    <div class="notice"><strong>岗位要求、入门目标，分开看。</strong><span>生成时，招聘文字和学习背景会发送至OpenAI，并产生API用量。本工具不保存历史；模型建议需核对，学完课程不等于达到招聘要求。</span></div>
+    <div class="workspace">
+      <section class="source-panel" aria-labelledby="source-title">
+        <div class="panel-heading"><h2 id="source-title"><span class="step">1</span>你想了解的岗位</h2><button id="example" class="text-button" type="button">载入教学示例</button></div>
+        <label for="source">粘贴职位描述或任职要求</label>
+        <textarea id="source" maxlength="12000" placeholder="例如：熟练掌握SQL、Python，具备独立数据分析能力；熟悉SFT、RAG和Agent的实际应用。" spellcheck="false" aria-describedby="input-help count"></textarea>
+        <div class="input-meta"><span id="input-help">保留完整句子，有助于对照上下文。</span><span id="count">0 / 12000</span></div>
+        <label for="background">你的起点 <span class="optional">可修改，不用填写身份信息</span></label>
+        <textarea id="background" class="background-input" maxlength="500" aria-describedby="background-help">哲学专业，没有互联网工作经历，也没有编程或计算机专业基础。</textarea>
+        <p id="background-help" class="field-help">已经会什么、每天能学多久，也可以写在这里。</p>
+        <div id="access-panel" hidden>
+          <label for="access-code">生成服务访问码</label>
+          <input id="access-code" type="password" maxlength="256" autocomplete="off" placeholder="由网站管理者提供" aria-describedby="access-help">
+          <p id="access-help" class="field-help">仅本次页面使用，不存入浏览器。查看课程无需访问码。</p>
+        </div>
+        <button id="analyze" class="primary" type="button">生成解读与学习路线</button>
+        <button id="cancel" class="text-button cancel" type="button" hidden>取消本次等待</button>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+        <a id="billing" class="text-button" href="https://platform.openai.com/settings/organization/billing/" target="_blank" rel="noopener noreferrer" hidden>打开OpenAI API账单与额度</a>
+        <div class="source-note"><span class="note-symbol" aria-hidden="true">≡</span><div><strong>先走第一步，不必一次学完</strong><p>路线会说明先补什么、学到哪一步、怎么检验。课程从已核实的官方资料中选择，保留语言和前置要求。</p></div></div>
+      </section>
+      <section class="results-panel" aria-labelledby="results-title">
+        <div class="panel-heading"><h2 id="results-title"><span class="step">2</span>你的学习路线</h2><span id="summary" class="result-count"></span></div>
+        <div id="results" aria-live="polite"></div>
+        <section id="course-library" class="course-library" aria-labelledby="library-title">
+          <h2 id="library-title">先看看，有哪些地方可以学</h2>
+          <p class="library-note">已核实的官方课程与指南，尚未按你的岗位筛选。不用全部学；生成路线后会为你选择。</p>
+          <div id="course-list"><p class="library-note">正在读取课程资料…</p></div>
+          <p id="verified-date" class="field-help"></p>
+        </section>
+      </section>
+    </div>
+    <footer><span>读懂要求，再迈出一步。</span><a href="manual.html" target="_blank" rel="noopener">使用手册与数据说明 ↗</a><span>课程是学习资源，招聘原文是岗位依据。</span></footer>
+  </main>
+</body></html>

@@ -1,0 +1,4 @@
+# Replace this example with your own domain. Caddy obtains an HTTPS certificate.
+YOUR_DOMAIN {
+    reverse_proxy 127.0.0.1:4317
+}

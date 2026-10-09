@@ -1,0 +1,10 @@
+{
+  "name": "job-reader",
+  "version": "0.2.0",
+  "description": "把招聘要求转成面向初学者的学习路线与课程建议",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {"start": "node start.mjs", "test": "node --test test/*.test.mjs", "build": "node scripts/build-manual.mjs && node scripts/build-worker.mjs"},
+  "engines": {"node": ">=24"}
+}
