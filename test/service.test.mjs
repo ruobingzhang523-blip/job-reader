@@ -1,22 +1,24 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createService} from '../service.mjs';
-const env={OPENAI_API_KEY:'test-only-not-real',APP_ACCESS_TOKEN:'test-access-code-with-32-characters',PUBLIC_ORIGIN:'https://learn.example'};
-function request({path='/api/analyze',method='POST',token=env.APP_ACCESS_TOKEN,origin=env.PUBLIC_ORIGIN,body={text:'熟悉SQL。',background:'零基础'},headers={}}={}){
+const env={OPENAI_API_KEY:'test-only-not-real',PUBLIC_ORIGIN:'https://learn.example'};
+function request({path='/api/analyze',method='POST',token='',origin=env.PUBLIC_ORIGIN,body={text:'熟悉SQL。',background:'零基础'},headers={}}={}){
   return new Request('https://learn.example'+path,{method,headers:{'Content-Type':'application/json',Origin:origin,...(token?{Authorization:'Bearer '+token}:{}),...headers},...(['GET','HEAD'].includes(method)?{}:{body:typeof body==='string'?body:JSON.stringify(body)})});
 }
-test('公网未配置访问码、缺码、错码都不会调用模型',async()=>{
-  let calls=0;const handler=createService({publicDeployment:true,analyzeImpl:async()=>{calls++;return {};}});
-  for(const [config,token,status] of [[{OPENAI_API_KEY:'test'},'',503],[env,'',401],[env,'wrong',401]])assert.equal((await handler(request({token}),config)).status,status);
-  assert.equal(calls,0);
+test('公网请求无需访问码；旧访问码配置和请求头不再影响生成',async()=>{
+  let calls=0;const handler=createService({analyzeImpl:async()=>{calls++;return {};}});
+  for(const config of [env,{...env,APP_ACCESS_TOKEN:'obsolete',REQUIRE_ACCESS_CODE:'true'}]){
+    for(const token of ['', 'obsolete-code'])assert.equal((await handler(request({token}),config)).status,200);
+  }
+  assert.equal(calls,4);
 });
-test('通过访问码后传递学习背景；健康接口不泄露密钥和访问码',async()=>{
-  const handler=createService({publicDeployment:true,analyzeImpl:async(text,config,options)=>({text,background:options.background})});
+test('无需访问码传递学习背景；健康接口不泄露密钥',async()=>{
+  const handler=createService({analyzeImpl:async(text,config,options)=>({text,background:options.background})});
   assert.deepEqual(await (await handler(request(),env)).json(),{text:'熟悉SQL。',background:'零基础'});
-  const health=await (await handler(request({path:'/api/health',method:'GET',token:''}),env)).json();assert.equal(health.requiresAccessCode,true);assert.ok(!JSON.stringify(health).includes(env.APP_ACCESS_TOKEN));assert.ok(!JSON.stringify(health).includes(env.OPENAI_API_KEY));
+  const health=await (await handler(request({path:'/api/health',method:'GET',token:''}),env)).json();assert.equal(health.requiresAccessCode,false);assert.ok(!JSON.stringify(health).includes(env.OPENAI_API_KEY));
 });
 test('课程可无访问码查看；私有文件与源码均不提供',async()=>{
-  const handler=createService({publicDeployment:true});
+  const handler=createService({});
   assert.equal((await (await handler(request({path:'/api/courses',method:'GET',token:''}),env)).json()).courses.length,8);
   for(const path of ['/.env.local','/server.mjs','/.git/config','/dist/server/index.js'])assert.equal((await handler(request({path,method:'GET',token:''}),env)).status,404);
 });

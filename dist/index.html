@@ -22,11 +22,6 @@
         <label for="background">你的起点 <span class="optional">可修改，不用填写身份信息</span></label>
         <textarea id="background" class="background-input" maxlength="500" aria-describedby="background-help">哲学专业，没有互联网工作经历，也没有编程或计算机专业基础。</textarea>
         <p id="background-help" class="field-help">已经会什么、每天能学多久，也可以写在这里。</p>
-        <div id="access-panel" hidden>
-          <label for="access-code">生成服务访问码</label>
-          <input id="access-code" type="password" maxlength="256" autocomplete="off" placeholder="由网站管理者提供" aria-describedby="access-help">
-          <p id="access-help" class="field-help">仅本次页面使用，不存入浏览器。查看课程无需访问码。</p>
-        </div>
         <button id="analyze" class="primary" type="button">生成解读与学习路线</button>
         <button id="cancel" class="text-button cancel" type="button" hidden>取消本次等待</button>
         <p id="status" class="status" role="status" aria-live="polite"></p>

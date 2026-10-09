@@ -15,8 +15,8 @@
 - 区分岗位最终要求、个人入门目标和仍需补足的能力。
 - 从人工核实的课程目录中选择资源，模型不能自造课程链接。
 - 保留招聘原文，供学习建议追溯。
-- 公网可浏览课程；使用模型生成功能需管理员提供访问码。
-- 不建账号，不设数据库，不持久保存输入、生成结果或访问码。
+- 公网可浏览课程；无需访问码即可提交生成请求，模型用量由网站管理者承担。
+- 不建账号，不设数据库，不持久保存输入或生成结果。
 - 支持本机Node.js、Docker服务器和Cloudflare Workers兼容运行时。
 
 ## 本机快速启动
@@ -45,9 +45,8 @@ Windows PowerShell用`Copy-Item .env.example .env.local`复制配置；之后同
 
 ```sh
 cp .env.example .env.local
-# 编辑配置：OPENAI_API_KEY、PUBLIC_ORIGIN、APP_ACCESS_TOKEN
+# 编辑配置：OPENAI_API_KEY、PUBLIC_ORIGIN
 # PUBLIC_ORIGIN形如 https://learn.your-domain.com
-# APP_ACCESS_TOKEN使用至少20位随机字符串，并私下交给获准使用模型的访客
 chmod 600 .env.local
 docker compose up -d --build
 ```
@@ -71,7 +70,7 @@ Compose只把应用端口映射到服务器本机；把`deploy/Caddyfile`里的�
 - [使用手册](docs/使用手册.md)：交互、使用步骤、架构、存储、服务端位置与故障处理。
 - [部署说明](docs/DEPLOYMENT.md)：Node、Docker和Worker部署。
 - [当前发布状态](docs/发布状态.md)：本项目实际部署与验证状态。
-- [安全说明](SECURITY.md)：密钥、访问码和公开部署限制。
+- [安全说明](SECURITY.md)：密钥与公开部署限制。
 
 ```sh
 npm test

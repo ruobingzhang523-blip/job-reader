@@ -14,12 +14,12 @@ macOS启动器会沿用电脑已经启用的HTTP代理；它不修改系统设�
 
 1. 把开源代码下载到服务器上的独立目录。
 2. 复制.env.example为.env.local；填写OPENAI_API_KEY，并设置PUBLIC_ORIGIN=https://你的域名。
-3. 使用密码管理器生成至少20位的随机访问码，填写APP_ACCESS_TOKEN。访问码与模型密钥必须不同。
+3. 本版本无需访问码；配置模型密钥后，访客生成消耗该模型账户的额度。
 4. 在Linux/macOS执行chmod 600 .env.local，仅向可信管理员开放该文件。不要把它上传GitHub。
 5. 执行docker compose up -d --build。配置文件把服务监听在容器内0.0.0.0，但只映射到宿主机127.0.0.1:4317。
 6. 将deploy/Caddyfile的YOUR_DOMAIN替换为自己的域名，并用它配置宿主机Caddy。反向代理目标保持127.0.0.1:4317；保留浏览器的Host头。
 7. DNS指向这台服务器，开放80和443端口。Caddy在满足域名验证条件时申请和续期HTTPS证书。不要把4317端口直接暴露给全网。
-8. 从另一网络访问https://你的域名，先查看课程，再填写访问码测试生成。
+8. 从另一网络访问https://你的域名，先查看课程，再直接点击生成进行测试。
 
 查看运行状态：docker compose ps。查看应用日志：docker compose logs --tail=50。停止服务：docker compose down。更新源码后重新运行docker compose up -d --build。
 
@@ -32,9 +32,9 @@ macOS启动器会沿用电脑已经启用的HTTP代理；它不修改系统设�
 
 ## 三、不用Docker
 
-安装Node.js 24，配置.env.local。仅通过同机反向代理转发时可以保留HOST=127.0.0.1；设置PUBLIC_ORIGIN为真实HTTPS地址，并设置APP_ACCESS_TOKEN以保护模型接口。
+安装Node.js 24，配置.env.local。仅通过同机反向代理转发时可以保留HOST=127.0.0.1；设置PUBLIC_ORIGIN为真实HTTPS地址。
 
-如果宿主环境要求监听所有网卡，设置HOST=0.0.0.0、PORT为服务端口，同时必须配置PUBLIC_ORIGIN和至少20位的APP_ACCESS_TOKEN。使用进程管理器保持npm start运行，再配置HTTPS代理。
+如果宿主环境要求监听所有网卡，设置HOST=0.0.0.0、PORT为服务端口，同时必须配置PUBLIC_ORIGIN。使用进程管理器保持npm start运行，再配置HTTPS代理。
 
 不要把0.0.0.0理解成可发给别人访问的地址，它只代表程序监听范围。公网访问仍需要服务器公网地址、域名、网络规则和运行中的服务。
 
@@ -42,7 +42,7 @@ macOS启动器会沿用电脑已经启用的HTTP代理；它不修改系统设�
 
 运行npm run build，输出为dist/server/index.js，默认导出fetch(request, env)。此文件打包了前端和共享服务端逻辑，不依赖Node的文件系统或本地.env.local。
 
-在兼容Cloudflare Workers的托管平台配置以下秘密变量：OPENAI_API_KEY、APP_ACCESS_TOKEN；可配置普通变量OPENAI_MODEL和MAX_REQUESTS_PER_HOUR。APP_ACCESS_TOKEN至少20位。未设置访问码或密钥时，课程和网页可查看，生成请求会明确拒绝。
+在兼容Cloudflare Workers的托管平台配置秘密变量OPENAI_API_KEY；可配置普通变量OPENAI_MODEL和MAX_REQUESTS_PER_HOUR。无需访问码。未设置模型密钥时，课程和网页可查看，生成请求会明确拒绝。
 
 PUBLIC_ORIGIN可设为实际HTTPS源站；不设置时Worker用请求URL的源站进行同源检查。使用自定义域名时相应更新。Sites拥有的站点使用Sites发布流程，不把它的项目标识复用为他人的新站点。
 

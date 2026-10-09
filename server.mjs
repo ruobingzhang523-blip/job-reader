@@ -8,9 +8,9 @@ const hostname=process.env.HOST||'127.0.0.1';
 const external=!['127.0.0.1','localhost','::1'].includes(hostname);
 const publicOrigin=process.env.PUBLIC_ORIGIN?new URL(process.env.PUBLIC_ORIGIN):null;
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error('PORT配置无效。');
-if(external&&(!publicOrigin||!['http:','https:'].includes(publicOrigin.protocol)||!process.env.APP_ACCESS_TOKEN||process.env.APP_ACCESS_TOKEN.length<20))throw new Error('对外监听需要PUBLIC_ORIGIN和至少20位的APP_ACCESS_TOKEN。');
+if(external&&(!publicOrigin||!['http:','https:'].includes(publicOrigin.protocol)))throw new Error('对外监听需要有效的PUBLIC_ORIGIN。');
 const assets=new Map([['/index.html','text/html; charset=utf-8'],['/app.js','text/javascript; charset=utf-8'],['/style.css','text/css; charset=utf-8'],['/manual.html','text/html; charset=utf-8'],['/manual.css','text/css; charset=utf-8']]);
-const handler=createService({publicDeployment:external,getAsset:async path=>({body:await readFile(new URL('./dist'+path,import.meta.url)),type:assets.get(path)})});
+const handler=createService({getAsset:async path=>({body:await readFile(new URL('./dist'+path,import.meta.url)),type:assets.get(path)})});
 const server=http.createServer(async(req,res)=>{
   const localPort=server.address()?.port||port;
   const allowedHosts=new Set([`127.0.0.1:${localPort}`,`localhost:${localPort}`,`[::1]:${localPort}`]);

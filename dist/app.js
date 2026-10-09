@@ -11,8 +11,6 @@ const summary=document.getElementById('summary');
 const button=document.getElementById('analyze');
 const exampleButton=document.getElementById('example');
 const cancelButton=document.getElementById('cancel');
-const accessInput=document.getElementById('access-code');
-let requiresAccessCode=false;
 let lastAnalyzed='',active=null;
 function el(tag,cls,text){const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node;}
 function inputKey(){return JSON.stringify([source.value,background.value]);}
@@ -59,12 +57,11 @@ async function run(){
   if(active)throw new Error('已有解读正在进行。');
   const text=source.value;const profile=background.value;const key=inputKey();
   if(!text.trim()){status.textContent='请先粘贴招聘要求，或载入教学示例。';status.classList.add('error');source.focus();return null;}
-  if(requiresAccessCode&&!accessInput.value.trim()){status.textContent='请先填写网站管理者提供的访问码；下方课程可直接查看。';status.classList.add('error');accessInput.focus();return null;}
   const controller=new AbortController();active=controller;busy(true);document.getElementById('billing').hidden=true;status.classList.remove('error');status.textContent='正在调用模型，整理岗位要求、学习顺序与课程。通常需要数十秒。';
   try{
-    const response=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json',...(accessInput.value?{Authorization:'Bearer '+accessInput.value.trim()}:{})},body:JSON.stringify({text,background:profile}),signal:controller.signal});
+    const response=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,background:profile}),signal:controller.signal});
     let data;try{data=await response.json();}catch{throw new Error('服务返回了无法读取的内容，请确认打开的是正在运行的网页。');}
-    if(!response.ok){document.getElementById('billing').hidden=requiresAccessCode||data.error?.code!=='insufficient_quota';throw new Error(data.error?.message||'生成失败，请稍后重试。');}
+    if(!response.ok){document.getElementById('billing').hidden=!['localhost','127.0.0.1','[::1]'].includes(location.hostname)||data.error?.code!=='insufficient_quota';throw new Error(data.error?.message||'生成失败，请稍后重试。');}
     if(data.mode!=='live_model'||!Array.isArray(data.items)||!Array.isArray(data.learning_path))throw new Error('服务返回的结果格式不正确。');
     render(data);lastAnalyzed=key;document.body.classList.remove('changed');status.textContent='已收到模型生成的解读与学习路线。请对照招聘原文检查，课程建议不代表招聘方承诺。';return data;
   }catch(e){status.textContent=e.name==='AbortError'?'已停止等待本次结果。已经发出的模型调用仍可能计费。':e.message;status.classList.add('error');if(lastAnalyzed&&lastAnalyzed!==key)document.body.classList.add('changed');return null;
@@ -74,7 +71,7 @@ source.addEventListener('input',edit);background.addEventListener('input',edit);
 button.addEventListener('click',()=>run());cancelButton.addEventListener('click',()=>active?.abort());
 exampleButton.addEventListener('click',()=>{source.value=EXAMPLE;edit();if(!lastAnalyzed)status.textContent='教学示例已载入。点击“生成解读与学习路线”后才会发送给模型。';});
 clear();count();
-fetch('/api/health').then(r=>r.json()).then(data=>{requiresAccessCode=Boolean(data.requiresAccessCode);document.getElementById('access-panel').hidden=!requiresAccessCode;document.getElementById('connection').textContent=data.configured?'模型服务已配置 · 待调用':'课程可浏览 · 生成服务待配置';if(!data.configured){status.textContent='网站管理者尚未配置模型服务，课程资料仍可查看。';status.classList.add('error');}}).catch(()=>{document.getElementById('connection').textContent='无法连接服务';status.textContent='请打开运行中的网站，直接打开HTML文件无法调用模型。';status.classList.add('error');});
+fetch('/api/health').then(r=>r.json()).then(data=>{document.getElementById('connection').textContent=data.configured?'模型服务已配置 · 待调用':'课程可浏览 · 生成服务待配置';if(!data.configured){status.textContent='网站管理者尚未配置模型服务，课程资料仍可查看。';status.classList.add('error');}}).catch(()=>{document.getElementById('connection').textContent='无法连接服务';status.textContent='请打开运行中的网站，直接打开HTML文件无法调用模型。';status.classList.add('error');});
 fetch('/api/courses').then(r=>{if(!r.ok)throw new Error();return r.json();}).then(data=>{
   const list=document.getElementById('course-list');list.replaceChildren();
   for(const course of data.courses){const detail=el('details','catalog-entry');const heading=el('summary');heading.append(el('span','',course.title),el('span','catalog-level',course.level));detail.append(heading,courseCard(course));list.append(detail);}
